@@ -30,4 +30,34 @@ describe('Donations', function (){
                 });
         });
     });
+    describe('POST /donations', function () {
+        it('should return confirmation message and update datastore', function(done) {
+            let donation = {
+                paymenttype: 'Visa' ,
+                amount: 1200,
+                upvotes: 0
+            };
+            chai.request(server)
+                .post('/donations')
+                .send(donation)
+                .end(function(err, res) {
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.have.property('message').equal('Donation Added!' );
+                    done();
+                });
+        });
+        after(function  (done) {
+            chai.request(server)
+                .get('/donations')
+                .end(function(err, res) {
+                    let result = _.map(res.body, (donation) => {
+                        return { paymenttype: donation.paymenttype,
+                            amount: donation.amount };
+                    }  );
+                    expect(result).to.include( { paymenttype: 'Visa', amount: 1200  } );
+                    done();
+                });
+        });  // end-after
+    });
+
 });
