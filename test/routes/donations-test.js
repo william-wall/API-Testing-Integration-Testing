@@ -59,5 +59,26 @@ describe('Donations', function (){
                 });
         });  // end-after
     });
+    describe('PUT /donations/:id/vote',  () => {
+        it('should return a message and the donation upvoted by 1', function(done) {
+            chai.request(server)
+                .put('/donations/1000001/vote')
+                .end(function(err, res) {
+                    expect(res).to.have.status(200);
+                    let donation = res.body.data ;
+                    expect(donation).to.include( { id: 1000001, upvotes: 3  } );
+                    done();
+                });
+            it('should return a 404 and a message for invalid donation id', function(done) {
+                chai.request(server)
+                    .put('/donations/1100001/vote')
+                    .end(function (err, res) {
+                        expect(res).to.have.status(404);
+                        expect(res.body).to.have.property('message', 'Invalid Donation Id!');
+                        done();
+                    });
+            });
+        });
+    });
 
 });

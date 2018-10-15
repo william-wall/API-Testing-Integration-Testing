@@ -66,8 +66,9 @@ router.incrementUpvotes = (req, res) => {
         donation.upvotes += 1;
         res.json({ message: 'Donation Successfully Upvoted!', data: donation });
     } else {
+        res.status(404);   // NEW
         res.json({ message: 'Invalid Donation Id!'});
-    }     
+    }
 };
 
 router.findTotalVotes = (req, res) => {
