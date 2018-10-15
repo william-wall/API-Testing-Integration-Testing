@@ -1,6 +1,7 @@
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let server = require('../../bin/www');
+let datastore = require('../../models/donations');
 let expect = chai.expect;
 
 chai.use(chaiHttp);
@@ -12,6 +13,17 @@ describe('Donations', function (){
 });
 
 describe('Donations', function (){
+    beforeEach(function(){
+        while(datastore.length > 0) {
+            datastore.pop();
+        }
+        datastore.push(
+            {id: 1000000, paymenttype: 'PayPal', amount: 1600, upvotes: 1}
+        );
+        datastore.push(
+            {id: 1000001, paymenttype: 'Direct', amount: 1100, upvotes: 2}
+        );
+    });
     describe('GET /donations',  () => {
         it('should return all the donations in an array', function(done) {
             chai.request(server)
