@@ -97,40 +97,42 @@ describe('Donations', function () {
         });
     });
     describe('DELETE /donations/:id', () => {
-        beforeEach(function () {
-            while (datastore.length > 0) {
-                datastore.pop();
-            }
-            datastore.push(
-                {id: 1000000, paymenttype: 'PayPal', amount: 1600, upvotes: 1}
-            );
-            datastore.push(
-                {id: 1000001, paymenttype: 'Direct', amount: 1100, upvotes: 2}
-            );
-        });
-        it('should delete donation by id and remove the object instance', function (done) {
-            chai.request(server)
-                .delete('/donations/1000001')
-                .end(function (err, res) {
-                    expect(res).to.have.status(200);
-                    let result = _.map(res.body, (donation) => {
-                        return {
-                            id: donation.id,
-                            amount: donation.amount
-                        };
+        describe('when id is valid', function () {
+            it('should delete donation by id and remove the object instance', function (done) {
+                chai.request(server)
+                    .delete('/donations/1000001')
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.have.property('message').equal('Donation Successfully Deleted!');
+                        done();
                     });
-                    expect(result).to.include({id: undefined, amount: undefined});
-                    expect(res.body).to.have.property('message').equal('Donation Successfully Deleted!');
-                    done();
-                });
+            });
+            after(function (done) {
+                chai.request(server)
+                    .get('/donations')
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res.body).be.be.a('array');
+                        let result = _.map(res.body, (donation) => {
+                            return {
+                                paymenttype: donation.paymenttype,
+                                amount: donation.amount
+                            };
+                        });
+                        expect(result).to.not.include({paymenttype: 'Visa', amount: 1200});
+                        done();
+                    })
+            })
         });
-        it('should return a message for invalid donation id and not delete any other objects', function (done) {
-            chai.request(server)
-                .delete('/donations/1100001')
-                .end(function (err, res) {
-                    expect(res.body).to.have.property('message', 'Donation NOT DELETED!');
-                    done();
-                });
+        describe('when id is invalid', function () {
+            it('should return a message for invalid donation id and not delete any other objects', function (done) {
+                chai.request(server)
+                    .delete('/donations/1100001')
+                    .end(function (err, res) {
+                        expect(res.body).to.have.property('message', 'Donation NOT DELETED!');
+                        done();
+                    });
+            });
         });
     });
 });

@@ -11,11 +11,6 @@ var donations = require('./routes/donations');
 
 var app = express();
 
-if (process.env.NODE_ENV !== 'test') {
-    app.use(logger('dev'));
-    // console.log('not working');
-}
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -23,7 +18,11 @@ app.set('view engine', 'ejs');
 // uncomment after placing your favicon in /public
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
-// app.use(logger('dev'));
+
+
+if (process.env.NODE_ENV.split(' ').join('') !== 'test') {
+    app.use(logger('dev'));
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
