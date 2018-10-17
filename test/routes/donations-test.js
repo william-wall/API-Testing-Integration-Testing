@@ -92,5 +92,32 @@ describe('Donations', function (){
             });
         });
     });
+    describe('DELETE /donations/:id',  () => {
+        beforeEach(function(){
+            while(datastore.length > 0) {
+                datastore.pop();
+            }
+            datastore.push(
+                {id: 1000000, paymenttype: 'PayPal', amount: 1600, upvotes: 1}
+            );
+            datastore.push(
+                {id: 1000001, paymenttype: 'Direct', amount: 1100, upvotes: 2}
+            );
+        });
+        it('should delete donation by id and remove the object instance', function(done) {
+            chai.request(server)
+                .delete('/donations/1000001')
+                .end(function(err, res) {
+                    expect(res).to.have.status(200);
+                    let result = _.map(res.body, (donation) => {
+                        return { id: donation.id,
+                            amount: donation.amount };
+                    }  );
+                    expect(result).to.include( { id: undefined, amount: undefined  } );
+                    expect(res.body).to.have.property('message').equal('Donation Successfully Deleted!' );
+                    done();
+                });
+    });
 
+    });
 });
